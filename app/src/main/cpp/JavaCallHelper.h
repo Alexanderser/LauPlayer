@@ -6,7 +6,7 @@
 #define MY_APPLICATION_JAVACALLHELPER_H
 
 
-#include "../../../../../../sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/jni.h"
+#include <jni.h>
 
 class JavaCallHelper{
 

@@ -27,6 +27,10 @@ public:
 
     void prepareFFmpeg();
     void start();
+    void play();
+
+    void setRenderCallback(void (*fun)(uint8_t *, int, int, int));
+
 private:
     //线程引用
     pthread_t pid_prepare;
@@ -37,6 +41,7 @@ private:
     JavaCallHelper *javaCallHelper;
     VideoPlay *videoPlay;
     AudioPlay *audioPlay;
+    RenderFrame renderFrame;
 };
 
 #endif //MY_APPLICATION_LAUFFMPEG_H

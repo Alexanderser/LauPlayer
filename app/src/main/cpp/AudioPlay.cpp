@@ -5,11 +5,18 @@
 #include "AudioPlay.h"
 #include "JavaCallHelper.h"
 
-AudioPlay::AudioPlay(int i, JavaCallHelper *pHelper, AVCodecContext *pContext) {
+AudioPlay::AudioPlay(int id, JavaCallHelper *javaCallHelper, AVCodecContext *avCodecContext,
+                     AVRational base)
+        : BasePlay(id, javaCallHelper, avCodecContext, base) {
 
 }
 
 void AudioPlay::play() {
 
 }
+
+void AudioPlay::stop() {
+}
+
+AudioPlay::~AudioPlay() = default;
 

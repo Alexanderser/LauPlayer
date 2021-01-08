@@ -7,10 +7,13 @@
 #include "macro.h"
 #include "VideoPlay.h"
 #include "AudioPlay.h"
+#include"android/log.h"
+#define LOGE(FORMAT, ...) __android_log_print(ANDROID_LOG_ERROR,"lau",FORMAT,##__VA_ARGS__);
 
 void *prepareFFmpeg_(void *args){
     LauFFmpeg *lauFFmpeg = static_cast<LauFFmpeg *>(args);
     lauFFmpeg->prepareFFmpeg();
+    return 0;
 }
 
 LauFFmpeg::LauFFmpeg(JavaCallHelper *javaCallHelper, const char *dataSource) {
@@ -78,11 +81,11 @@ void LauFFmpeg::prepareFFmpeg() {
         }
         if (codep->codec_type == AVMEDIA_TYPE_AUDIO) {
             //音频
-            audioPlay = new AudioPlay(i, javaCallHelper, codecContext);
+            audioPlay = new AudioPlay(i, javaCallHelper, codecContext, AVRational());
         } else if (codep->codec_type == AVMEDIA_TYPE_VIDEO) {
             //视频
-            videoPlay = new VideoPlay(0, nullptr, nullptr, AVRational(), i, javaCallHelper,
-                                      codecContext);
+            videoPlay = new VideoPlay(i, javaCallHelper, codecContext, AVRational());
+            videoPlay->setRenderCallBack(renderFrame);
         }
 
         if (!audioPlay && !videoPlay) {
@@ -98,7 +101,9 @@ void LauFFmpeg::prepareFFmpeg() {
 }
 
 void *startThread(void *args){
-
+    LauFFmpeg *lauFFmpeg = static_cast<LauFFmpeg *>(args);
+    lauFFmpeg->play();
+    return 0;
 };
 
 void LauFFmpeg::start() {
@@ -110,5 +115,50 @@ void LauFFmpeg::start() {
         videoPlay->play();
     }
     pthread_create(&pid_play, NULL, startThread, this);
+}
+
+void LauFFmpeg::play() {
+    int ret = 0;
+    while (isPlaying) {
+        if (audioPlay && audioPlay->pkt_queue.size() > 100) {
+            //思想:队列 生产者的生产速度远远大于消费者的速度  休眠10ms
+            av_usleep(1000 * 10);
+            continue;
+        }
+        if (videoPlay && videoPlay->pkt_queue.size() > 100) {
+            //思想:队列 生产者的生产速度远远大于消费者的速度  休眠10ms
+            av_usleep(1000 * 10);
+            continue;
+        }
+        //读取包
+        AVPacket *avPacket = av_packet_alloc();
+        //从媒体读取音频,视频包
+        ret = av_read_frame(formatContext, avPacket);
+        if (ret == 0) {
+            if (audioPlay && avPacket->stream_index == audioPlay->channelId) {
+                audioPlay->pkt_queue.put(avPacket);
+            } else if (videoPlay && avPacket->stream_index == videoPlay->channelId) {
+                videoPlay->pkt_queue.put(avPacket);
+            }
+        } else if (ret == AVERROR_EOF) {
+            //读取完毕
+            if (videoPlay->pkt_queue.empty() && videoPlay->frame_queue.empty() &&
+                audioPlay->pkt_queue.empty() && audioPlay->frame_queue.empty()) {
+                LOGE("播放完毕...")
+                break;
+            }
+            //因为seek的存在,就算读取完毕,也要循环执行av_read_frame(否则seek无效
+        } else {
+            break;
+        }
+    }
+
+    isPlaying = 0;
+    audioPlay->stop();
+    videoPlay->stop();
+}
+
+void LauFFmpeg::setRenderCallback(RenderFrame renderFrame1) {
+    this->renderFrame = renderFrame1;
 }
 

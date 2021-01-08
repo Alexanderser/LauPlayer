@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 
@@ -29,9 +30,11 @@ public class MainActivity extends AppCompatActivity {
         //拉流播放
         lauPlayer = new LauPlayer();
         lauPlayer.setSurfaceView(surfaceView);
-        File file = new File(Environment.getExternalStorageDirectory(), "test.mp4");
+        File file = new File(Environment.getExternalStorageDirectory(), "Movies/Screen Recorder/20-10-03-09-03-09.mp4");
+        Log.e(TAG, "onCreate: "+file.exists() );
         lauPlayer.setDataSource(file.getAbsolutePath());
         lauPlayer.setOnPrepareListener(() -> {
+            Log.e(TAG, "onCreate: prepare" );
             lauPlayer.start();
         });
     }
@@ -41,7 +44,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void startLive(View view) {
 //        livePusher.startLive("rtmp://106.53.24.225:1935/myapp/");
-        livePusher.startLive("rtmp://192.168.1.153:1935/live/12345");
+//        livePusher.startLive("rtmp://192.168.1.153:1935/live/12345");
+        lauPlayer.prepare();
     }
 //    public void startLive(View view) {
 //        livePusher.startLive("rtmp://192.168.1.153:1935/myapp/");

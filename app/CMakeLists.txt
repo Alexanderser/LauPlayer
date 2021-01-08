@@ -7,11 +7,6 @@ add_library( # Sets the name of the library.
         native-lib
         SHARED
         ${SOURCE}
-        src/main/cpp/lau-player.cpp
-        src/main/cpp/LauFFmpeg.cpp
-        src/main/cpp/JavaCallHelper.cpp
-        src/main/cpp/AudioPlay.cpp
-        src/main/cpp/VideoPlay.cpp
         src/main/cpp/bspatch.c
         ${bzip})
 
@@ -19,7 +14,7 @@ add_library( # Sets the name of the library.
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${CMAKE_SOURCE_DIR}/libs/armeabi-v7a/")
 
 include_directories(src/main/cpp/bzip)
-include_directories(src/main/cpp/include)
+include_directories(src/main/cpp/include src/main/cpp)
 add_subdirectory(src/main/cpp/librtmp)
 
 add_library(avformat SHARED IMPORTED )

@@ -20,13 +20,15 @@ public:
         pthread_cond_destroy(&cond);
         pthread_mutex_destroy(&mutex);
     }
-    void put( T new_value) {
+
+    void put(T new_value) {
         //锁 和智能指针原理类似，自动释放
         pthread_mutex_lock(&mutex);
         if (work) {
             q.push(new_value);
             pthread_cond_signal(&cond);
-        }else{
+            pthread_mutex_unlock(&mutex);
+        } else {
         }
         pthread_mutex_unlock(&mutex);
     }

@@ -1,5 +1,6 @@
 package com.foxconn.lau.myapplication;
 
+import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -9,7 +10,7 @@ import androidx.annotation.NonNull;
 public class  LauPlayer implements SurfaceHolder.Callback {
 
     static {
-        System.loadLibrary("lau-player");
+        System.loadLibrary("native-lib");
     }
 
     private native void native_prepare(String dataSource);
@@ -43,11 +44,12 @@ public class  LauPlayer implements SurfaceHolder.Callback {
     }
 
     public void setDataSource(String absolutePath) {
-        this.dataSource = dataSource;
+        this.dataSource = absolutePath;
 
     }
 
     public void prepare() {
+        Log.e("TAG", "prepare: " + dataSource);
         native_prepare(dataSource);
     }
 
