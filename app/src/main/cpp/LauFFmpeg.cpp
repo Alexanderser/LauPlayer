@@ -81,7 +81,8 @@ void LauFFmpeg::prepareFFmpeg() {
             audioPlay = new AudioPlay(i, javaCallHelper, codecContext);
         } else if (codep->codec_type == AVMEDIA_TYPE_VIDEO) {
             //视频
-            videoPlay = new VideoPlay(i, javaCallHelper, codecContext);
+            videoPlay = new VideoPlay(0, nullptr, nullptr, AVRational(), i, javaCallHelper,
+                                      codecContext);
         }
 
         if (!audioPlay && !videoPlay) {
@@ -94,9 +95,11 @@ void LauFFmpeg::prepareFFmpeg() {
             javaCallHelper->onPrepare(THREAD_CHILD);
         }
     }
-
-
 }
+
+void *startThread(void *args){
+
+};
 
 void LauFFmpeg::start() {
     isPlaying = true;
@@ -106,5 +109,6 @@ void LauFFmpeg::start() {
     if (videoPlay){
         videoPlay->play();
     }
+    pthread_create(&pid_play, NULL, startThread, this);
 }
 

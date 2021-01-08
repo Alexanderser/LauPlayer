@@ -30,12 +30,13 @@ public:
 private:
     //线程引用
     pthread_t pid_prepare;
+    pthread_t pid_play;
+    bool isPlaying;
     AVFormatContext *formatContext;
     char *url;
     JavaCallHelper *javaCallHelper;
     VideoPlay *videoPlay;
     AudioPlay *audioPlay;
-    bool isPlaying;
 };
 
 #endif //MY_APPLICATION_LAUFFMPEG_H
