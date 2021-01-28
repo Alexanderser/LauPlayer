@@ -11,42 +11,42 @@ extern "C"{
 }
 JavaCallHelper *javaCallHelper;
 
-ANativeWindow *window = 0;
+ANativeWindow *window = nullptr;
 LauFFmpeg *lauFFmpeg;
-JavaVM *javaVm = NULL;
+JavaVM *javaVm = nullptr;
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     javaVm = vm;
     return JNI_VERSION_1_4;
 }
 
-void renderFrame(uint8_t *data, int linesize, int w, int h) {
+void renderFrame(uint8_t *data, int line_size, int w, int h) {
     //渲染
     ANativeWindow_setBuffersGeometry(window, w, h, WINDOW_FORMAT_RGBA_8888);
     ANativeWindow_Buffer windowBuffer;
-    if (ANativeWindow_lock(window, &windowBuffer, 0)) {
+    if (ANativeWindow_lock(window, &windowBuffer, nullptr)) {
         ANativeWindow_release(window);
-        window = 0;
+        window = nullptr;
         return;
     }
 
     //window中的缓冲区数据
-    uint8_t *dst_data = static_cast<uint8_t *>(windowBuffer.bits);
+    auto *dst_data = static_cast<uint8_t *>(windowBuffer.bits);
     //一行像素的字节数   stride 一行像素个数   rgba 4个字节 ,所以大小为 stride84
     int window_linesize = windowBuffer.stride * 4;
     //数据源
     uint8_t *src_data = data;
     for (int i = 0; i < windowBuffer.height; ++i) {
-        memcpy(dst_data + i * window_linesize, src_data + i * linesize, window_linesize);
+        memcpy(dst_data + i * window_linesize, src_data + i * line_size, window_linesize);
     }
-
+    ANativeWindow_unlockAndPost(window);
 }
 
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_foxconn_lau_myapplication_LauPlayer_native_1prepare(JNIEnv *env, jobject thiz,
                                                              jstring data_source_) {
-    const char *dataSource = env->GetStringUTFChars(data_source_, 0);
+    const char *dataSource = env->GetStringUTFChars(data_source_, nullptr);
     javaCallHelper = new JavaCallHelper(javaVm, env, thiz);
     lauFFmpeg= new LauFFmpeg(javaCallHelper, dataSource);
     lauFFmpeg->setRenderCallback(renderFrame);
@@ -61,7 +61,6 @@ Java_com_foxconn_lau_myapplication_LauPlayer_native_1start(JNIEnv *env, jobject 
     if (lauFFmpeg) {
         lauFFmpeg->start();
     }
-
 }
 extern "C"
 JNIEXPORT void JNICALL
@@ -69,7 +68,7 @@ Java_com_foxconn_lau_myapplication_LauPlayer_native_1set_1surface(JNIEnv *env, j
                                                                   jobject surface) {
     if (window) {
         ANativeWindow_release(window);
-        window = 0;
+        window = nullptr;
     }
     window = ANativeWindow_fromSurface(env, surface);
 

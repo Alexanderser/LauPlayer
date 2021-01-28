@@ -15,7 +15,7 @@ class BasePlay{
 public:
     BasePlay(int id, JavaCallHelper *javaCallHelper, AVCodecContext *avCodecContext,
              AVRational base)
-            : channelId(id), javaCallHelper(javaCallHelper), avCodecContext(avCodecContext) {
+            : channelId(id), javaCallHelper(javaCallHelper), avCodecContext(avCodecContext),time_base(base) {
     }
 
     static void releaseAvPacket(AVPacket *&packet){
@@ -49,6 +49,8 @@ public:
     volatile bool isPlaying;
     AVCodecContext *avCodecContext;
     JavaCallHelper *javaCallHelper;
+    AVRational time_base;
+    double clock;
 };
 
 #endif //MY_APPLICATION_BASEPLAY_Hd

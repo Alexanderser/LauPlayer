@@ -4,6 +4,8 @@
 
 #include "JavaCallHelper.h"
 #include "macro.h"
+#include"android/log.h"
+#define LOGE(FORMAT, ...) __android_log_print(ANDROID_LOG_ERROR,"lau",FORMAT,##__VA_ARGS__);
 
 JavaCallHelper::JavaCallHelper(JavaVM *_javaVM, JNIEnv *_env, jobject &_jobj) {
     this->javaVm = _javaVM;

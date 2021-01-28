@@ -33,15 +33,15 @@ public:
 
 private:
     //线程引用
-    pthread_t pid_prepare;
-    pthread_t pid_play;
-    bool isPlaying;
-    AVFormatContext *formatContext;
+    pthread_t pid_prepare{};
+    pthread_t pid_play{};
+    bool isPlaying{};
+    AVFormatContext *formatContext{};
     char *url;
     JavaCallHelper *javaCallHelper;
-    VideoPlay *videoPlay;
-    AudioPlay *audioPlay;
-    RenderFrame renderFrame;
+    VideoPlay *videoPlay{};
+    AudioPlay *audioPlay{};
+    RenderFrame renderFrame{};
 };
 
 #endif //MY_APPLICATION_LAUFFMPEG_H

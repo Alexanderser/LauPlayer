@@ -6,10 +6,17 @@
 
 #include <queue>
 #include <pthread.h>
+extern "C"{
+#include <librtmp/rtmp.h>
+}
+
+
 using namespace std;
 
 template<typename T>
 class SafeQueue {
+//    typedef void (*ReleaseHandle)(T &frame);
+//    typedef void (*SyncHandle)(T &queue);
 public:
     SafeQueue() {
         pthread_mutex_init(&mutex, NULL);
@@ -29,6 +36,7 @@ public:
             pthread_cond_signal(&cond);
             pthread_mutex_unlock(&mutex);
         } else {
+//            releaseHandle(new_value);
         }
         pthread_mutex_unlock(&mutex);
     }
@@ -66,6 +74,7 @@ public:
     }
 
     void clear() {
+
         pthread_mutex_lock(&mutex);
         int size = q.size();
         for (int i = 0; i < size; ++i) {
@@ -80,12 +89,21 @@ public:
         //同步代码块 当我们调用sync方法的时候，能够保证是在同步块中操作queue 队列
         pthread_mutex_unlock(&mutex);
     }
+
+//    void setReleaseHandle(ReleaseHandle r){
+//        releaseHandle=r;
+//    }
+//    void setSyncHandle(SyncHandle s){
+//        syncHandle = s;
+//    }
 private:
     pthread_cond_t cond;
     pthread_mutex_t mutex;
     queue<T> q;
     //是否工作的标记 1 ：工作 0：不接受数据 不工作
     int work;
+//    ReleaseHandle releaseHandle;
+//    SyncHandle syncHandle;
 };
 
 
